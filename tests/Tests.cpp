@@ -5,18 +5,18 @@
 #include "../src/Parser.h"
 #include "../src/Parser.cpp"
 
-inline double round4(double num){
+inline double round4(double num) {
     return round(num * 10000) / 10000;
 }
 
-bool test(const char* input, double expected) {
+bool test(const char *input, double expected) {
     try {
         Parser parser(input);
         double result = round4(Solve(parser.Parse()));
         if (result == expected) return true;
         std::cout << input << " = " << expected << " : error, got " << result << '\n';
     }
-    catch (std::exception& e) {
+    catch (std::exception &e) {
         std::cout << input << " : exception: " << e.what() << '\n';
     }
     return false;
@@ -56,6 +56,7 @@ TEST_CASE("simple arithmetic") {
     CHECK(test("5 * 4 + 3 * 2 + 1", 27));
     CHECK(test("2.5", 2.5));
     CHECK(test("3 % 2", 1));
+    CHECK(test("(12+34  -+5)", 41));
 }
 
 TEST_CASE("math functions") {
@@ -64,9 +65,16 @@ TEST_CASE("math functions") {
     CHECK(test("sin(cos(10))", -0.7440));
     CHECK(test("sin(5)*cos(5)", -0.2720));
     CHECK(test("ln(5)", 1.6094));
-    CHECK(test("log(15)", 1.1761));
+    CHECK(test("lg(15)", 1.1761));
+    CHECK(test("asin(0.3)", 0.3047));
+    CHECK(test("acos(0.7)", 0.7954));
+    CHECK(test("tan(55)", -45.1831));
+    CHECK(test("atan(5)", 1.3734));
 }
 
 TEST_CASE("errors") {
-    CHECK(!test("2..5", 2.5));
+    CHECK(!test("2..5", 0));
+    CHECK(!test("si7", 0));
+    CHECK(!test("(5*sin(5)", 0));
+    CHECK(!test("asin(5)", 0));
 }

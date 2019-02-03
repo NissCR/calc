@@ -4,20 +4,20 @@
 #include <algorithm>
 #include "src/Parser.h"
 
-std::vector<std::string> split(std::string& str, const char del = ' ') {
-    if(del != ' ')
+std::vector<std::string> split(std::string &str, const char del = ' ') {
+    if (del != ' ')
         std::replace(str.begin(), str.end(), del, ' ');
 
     std::vector<std::string> arr;
     std::istringstream stream(str);
 
-    for(auto it = std::istream_iterator<std::string>(stream); it != std::istream_iterator<std::string>(); it++)
+    for (auto it = std::istream_iterator<std::string>(stream); it != std::istream_iterator<std::string>(); it++)
         arr.push_back(*it);
 
     return arr;
 }
 
-void ReplaceVars(std::string& formula, std::string str_vars) {
+void ReplaceVars(std::string &formula, std::string str_vars) {
     std::vector<std::string> vars = split(str_vars);
     for (auto &var : vars) {
         std::vector<std::string> pair = split(var, '=');
@@ -32,20 +32,20 @@ void ReplaceVars(std::string& formula, std::string str_vars) {
     }
 }
 
-int main(int argc, char* argv[]) {
-    if(argc <= 1)
+int main(int argc, char *argv[]) {
+    if (argc <= 1)
         std::cout << "Нет формулы";
 
     std::string vars;
-    std::cin >> vars;
+    getline(std::cin, vars);
 
     std::string formula = argv[1];
     ReplaceVars(formula, vars);
 
-    const char* expr = formula.c_str();
+    const char *expr = formula.c_str();
 
     Parser parser(expr);
     double result = Solve(parser.Parse());
 
-    std::cout << result;
+    std::cout << result << std::endl;
 }

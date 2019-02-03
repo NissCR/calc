@@ -6,18 +6,20 @@
 
 class Parser {
 public:
-    explicit Parser(const char* input);
+    explicit Parser(const char *input);
+
     Expression Parse();
 
 private:
-    const char* m_input; // Часть строки, которую ещё не распарсили
+    const char *m_input; // Часть строки, которую ещё не распарсили
 
     std::string ParseToken(); // Парсит один токен
     Expression ParseSimpleExpression(); // Парсит простое выражение
     Expression ParseBinaryExpression(int min_priority); // Парсит бинарное выражение
 };
 
-int GetPriority(const std::string&);
-double Solve(const Expression&);
+int GetPriority(const std::string &);
+
+double Solve(const Expression &);
 
 #endif //CALC_PARSER_H
