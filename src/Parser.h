@@ -11,11 +11,13 @@ public:
 
 private:
     const char* m_input; // Часть строки, которую ещё не распарсили
+
     std::string ParseToken(); // Парсит один токен
     Expression ParseSimpleExpression(); // Парсит простое выражение
     Expression ParseBinaryExpression(int min_priority); // Парсит бинарное выражение
 };
 
-double calc(const Expression&);
+int GetPriority(const std::string&);
+double Solve(const Expression&);
 
 #endif //CALC_PARSER_H

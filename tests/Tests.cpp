@@ -12,7 +12,7 @@ inline double round4(double num){
 bool test(const char* input, double expected) {
     try {
         Parser parser(input);
-        double result = round4(calc(parser.Parse()));
+        double result = round4(Solve(parser.Parse()));
         if (result == expected) return true;
         std::cout << input << " = " << expected << " : error, got " << result << '\n';
     }
@@ -61,10 +61,10 @@ TEST_CASE("simple arithmetic") {
 TEST_CASE("math functions") {
     CHECK(test("sin(2)", 0.9093));
     CHECK(test("cos(3^3)", -0.2921));
-    CHECK(test("", ));
-    CHECK(test("", ));
-    CHECK(test("", ));
-    CHECK(test("", ));
+    CHECK(test("sin(cos(10))", -0.7440));
+    CHECK(test("sin(5)*cos(5)", -0.2720));
+    CHECK(test("ln(5)", 1.6094));
+    CHECK(test("log(15)", 1.1761));
 }
 
 TEST_CASE("errors") {

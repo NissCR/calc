@@ -1,70 +1,51 @@
 #include <iostream>
+#include <iterator>
+#include <sstream>
+#include <algorithm>
 #include "src/Parser.h"
-int errors;
 
-void test(const char* input, double expected) {
-    try {
-        std::cout << "Input: " << input << std::endl;
-        Parser parser(input);
-        double result = calc(parser.Parse());
-        if (result == expected) return;
-        std::cout << input << " = " << expected << " : error, got " << result << '\n';
-    }
-    catch (std::exception& e) {
-        std::cout << input << " : exception: " << e.what() << '\n';
-    }
-    ++errors;
+std::vector<std::string> split(std::string& str, const char del = ' ') {
+    if(del != ' ')
+        std::replace(str.begin(), str.end(), del, ' ');
+
+    std::vector<std::string> arr;
+    std::istringstream stream(str);
+
+    for(auto it = std::istream_iterator<std::string>(stream); it != std::istream_iterator<std::string>(); it++)
+        arr.push_back(*it);
+
+    return arr;
 }
 
-void testing(const char* input, double expected) {
-    try{
-        Parser parser(input);
-        auto result = calc(parser.Parse());
-        //if(result == expected) return;
-        std::cout << input << " = " << result << " exp: " << expected << std::endl;
-    } catch (std::exception& e) {
-        std::cout << input << ". Exception: " << e.what() << std::endl;
+void ReplaceVars(std::string& formula, std::string str_vars) {
+    std::vector<std::string> vars = split(str_vars);
+    for (auto &var : vars) {
+        std::vector<std::string> pair = split(var, '=');
+
+        // Заменить все имена переменных на их значения
+        size_t pos = 0;
+        while ((pos = formula.find(pair[0], pos)) != std::string::npos) {
+            formula.replace(pos, pair[0].length(), pair[1]);
+            pos += pair[1].length();
+        }
+        //formula.replace(formula.find(pair[0]), size(pair[1]) - 1, pair[1]);
     }
 }
 
-int main() {
-    /*test("0", 0);
-    test("1", 1);
-    test("9", 9);
-    test("10", 10);
-    test("+1", 1);
-    test("-1", -1);
-    test("(1)", 1);
-    test("(-1)", -1);
-    test("abs(-1)", 1);
-    test("1+20", 21);
-    test("1 + 20", 21);
-    test("1+20+300", 321);
-    test("1+20+300+4000", 4321);
-    test("-1+20", 19);
-    test("--1+20", 21);
-    test("---1+20", 19);
-    test("(1+20)", 21);
-    test("-2*3", -6);
-    test("2*-3", -6);
-    test("1++2", 3);
-    test("1+10*2", 21);
-    test("10*2+1", 21);
-    test("(1+20)*2", 42);
-    test("2*(1+20)", 42);
-    test("(1+2)*(3+4)", 21);
-    test("2*3+4*5", 26);
-    test("100+2*10+3", 123);
-    test("2^3", 8);
-    test("2^3*5+2", 42);
-    test("5*2^3+2", 42);
-    test("2+5*2^3", 42);
-    test("1+2^3*10", 81);
-    test("2^3+2*10", 28);
-    test("5 * 4 + 3 * 2 + 1", 27);
-    test("2.5", 2.5);
-    test("2..5", 2.5);
-    test("sin(2)", 0.909297);*/
+int main(int argc, char* argv[]) {
+    if(argc <= 1)
+        std::cout << "Нет формулы";
 
-    std::cout << "Done with " << errors << " errors.\n";
+    std::string vars;
+    std::cin >> vars;
+
+    std::string formula = argv[1];
+    ReplaceVars(formula, vars);
+
+    const char* expr = formula.c_str();
+
+    Parser parser(expr);
+    double result = Solve(parser.Parse());
+
+    std::cout << result;
 }

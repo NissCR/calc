@@ -1,4 +1,5 @@
 #include "Parser.h"
+#include "Tokens.h"
 #include <algorithm>
 #include <string>
 #include <cstring>
@@ -29,8 +30,6 @@ std::string Parser::ParseToken() {
     }
 
     // Проверка всех известных токенов - операции, токены
-    static const std::string TOKENS[] =
-            {"+", "-", "*", "/", "^", "%", "abs", "sin", "cos", "(", ")"}; // TODO: ещё функций!
     for(auto token : TOKENS){
         if(std::strncmp(m_input, token.c_str(), token.size()) == 0){
             m_input += token.size();
@@ -66,14 +65,13 @@ Expression Parser::ParseSimpleExpression() {
     return Expression(token, arg);
 }
 
-int GetPriority(const std:: string& operation){
-    // TODO: на switch!
-    if (operation == "+") return 1;
-    if (operation == "-") return 1;
-    if (operation == "*") return 2;
-    if (operation == "/") return 2;
-    if (operation == "%") return 2;
-    if (operation == "^") return 3;
+int GetPriority(const std::string& operation){
+    if (operation == TOKENS[PLUS]) return 1;
+    if (operation == TOKENS[MINUS]) return 1;
+    if (operation == TOKENS[MULTIPL]) return 2;
+    if (operation == TOKENS[DIV]) return 2;
+    if (operation == TOKENS[MOD]) return 2;
+    if (operation == TOKENS[POW]) return 3;
     return 0; // Не бинарная операция
 }
 
@@ -101,31 +99,35 @@ Expression Parser::Parse() {
     return ParseBinaryExpression(0);
 }
 
-double calc(const Expression& expr){
+double Solve(const Expression& expr){
     switch (expr.args.size()) {
         //Число
         case 0:
             return std::stod(expr.token);
         // Унарная операция
         case 1: {
-            auto num = calc(expr.args[0]);
-            if(expr.token == "+") return num;
-            if(expr.token == "-") return -num;
-            if(expr.token == "abs") return fabs(num);
-            if(expr.token == "sin") return sin(num);
-            if(expr.token == "cos") return cos(num);
+            auto num = Solve(expr.args[0]);
+            if(expr.token == TOKENS[PLUS]) return num;
+            if(expr.token == TOKENS[MINUS]) return -num;
+            if(expr.token == TOKENS[ABS]) return fabs(num);
+            if(expr.token == TOKENS[SIN]) return sin(num);
+            if(expr.token == TOKENS[ASIN]) return asin(num);
+            if(expr.token == TOKENS[COS]) return cos(num);
+            if(expr.token == TOKENS[ACOS]) return acos(num);
+            if(expr.token == TOKENS[LN]) return log(num);
+            if(expr.token == TOKENS[LOG]) return log10(num);
             throw std::runtime_error("Неизвестный унарный оператор");
         }
         // Бинарная операция
         case 2: {
-            auto left = calc(expr.args[0]);
-            auto right = calc(expr.args[1]);
-            if(expr.token == "+") return left + right;
-            if(expr.token == "-") return left - right;
-            if(expr.token == "*") return left * right;
-            if(expr.token == "/") return left / right;
-            if(expr.token == "%") return (int)left % (int)right;
-            if(expr.token == "^") return pow(left, right);
+            auto left = Solve(expr.args[0]);
+            auto right = Solve(expr.args[1]);
+            if(expr.token == TOKENS[PLUS]) return left + right;
+            if(expr.token == TOKENS[MINUS]) return left - right;
+            if(expr.token == TOKENS[MULTIPL]) return left * right;
+            if(expr.token == TOKENS[DIV]) return left / right;
+            if(expr.token == TOKENS[MOD]) return (int)left % (int)right;
+            if(expr.token == TOKENS[POW]) return pow(left, right);
             throw std::runtime_error("Неизвестный бинарный оператор");
         }
 
